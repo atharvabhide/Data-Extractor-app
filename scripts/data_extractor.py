@@ -1,18 +1,36 @@
-import pdf2image
+from pdf2image import convert_from_path
+from pytesseract import image_to_string
 import pytesseract
+import os 
 
-# Convert the PDF to images
-poppler_path = r"C:\Program Files\poppler-0.68.0\bin"
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'
-tessarect_path = r""
-images = pdf2image.convert_from_path(r'C:\Users\athar\OneDrive\Desktop\programming\projects\deeplogic ai assessment\files\pdf\sample1.pdf',
-                                     poppler_path=poppler_path)
+POPPLER_PATH = r'C:\Program Files (x86)\poppler-23.05.0\Library\bin'
+FILES_PATH = os.path.join(os.getcwd(), '../files')
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
-# Perform OCR on the images
-text = []
-for image in images:
-    text.append(pytesseract.image_to_string(image))
+def convert_pdf_to_img(pdf_file):
+    return convert_from_path(pdf_file, poppler_path=POPPLER_PATH)
 
-# Create a new PDF with the OCR text
-with open('output.pdf', 'w') as f:
-    f.writelines(text)
+def convert_image_to_text(file):
+    text = image_to_string(file)
+    return text
+
+def get_text_from_any_pdf(pdf_file):
+    images = convert_pdf_to_img(pdf_file)
+    final_text = ""
+    for pg, img in enumerate(images):
+        final_text += convert_image_to_text(img)
+    return final_text
+
+def get_text_from_any_image(image_file):
+    return convert_image_to_text(image_file)
+
+for folder in os.listdir(FILES_PATH):
+    for file in os.listdir(os.path.join(FILES_PATH, folder)):
+        if file.endswith('.pdf'):
+            print("File Name: ", file)
+            print(get_text_from_any_pdf(os.path.join(FILES_PATH, folder, file)))
+            print('*'*150)
+        elif file.endswith('.jpg') or file.endswith('.png') or file.endswith('.jpeg'):
+            print("File Name: ", file)
+            print(get_text_from_any_image(os.path.join(FILES_PATH, folder, file)))
+            print('*'*150)
