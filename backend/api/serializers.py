@@ -5,7 +5,7 @@ from rest_framework.serializers import ValidationError
 class FileSerializer(ModelSerializer):
     class Meta:
         model = File
-        exclude = ['uuid']
+        exclude = ['uuid', 'user']
 
     def create(self, validated_data):
         file = File.objects.create(**validated_data)
