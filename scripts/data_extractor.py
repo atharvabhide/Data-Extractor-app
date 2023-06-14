@@ -2,6 +2,7 @@ from pdf2image import convert_from_path
 from pytesseract import image_to_string
 import pytesseract
 import os 
+from PIL import Image
 
 POPPLER_PATH = r'C:\Program Files (x86)\poppler-23.05.0\Library\bin'
 FILES_PATH = os.path.join(os.getcwd(), '../files')
@@ -22,7 +23,8 @@ def get_text_from_any_pdf(pdf_file):
     return final_text
 
 def get_text_from_any_image(image_file):
-    return convert_image_to_text(image_file)
+    image = Image.open(image_file)
+    return convert_image_to_text(image)
 
 for folder in os.listdir(FILES_PATH):
     for file in os.listdir(os.path.join(FILES_PATH, folder)):
