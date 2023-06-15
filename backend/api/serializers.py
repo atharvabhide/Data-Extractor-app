@@ -1,4 +1,4 @@
-from api.models import File
+from api.models import File, User
 from rest_framework.serializers import ModelSerializer
 from rest_framework.serializers import ValidationError
 
@@ -8,7 +8,9 @@ class FileSerializer(ModelSerializer):
         exclude = ['uuid', 'user']
 
     def create(self, validated_data):
-        file = File.objects.create(**validated_data)
+        email = self.context['request'].data['email']
+        user = User.objects.get(email=email)
+        file = File.objects.create(user=user, **validated_data)
         return file
     
     def validate(self, attrs):

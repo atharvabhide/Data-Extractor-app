@@ -24,17 +24,13 @@ def api_get_token(request, *args, **kwargs):
     userobject = User.objects.filter(email=email)
     user = userobject[0]
 
-    print("userobject", userobject)
-    print("user", user)
-
     if(userobject):
         token, created = Token.objects.get_or_create(
             user=userobject[0])  # Create token for the user
         if(user.check_password(password)):
-            print("I am coming from second if")
             return JsonResponse({'status': 'ok', 'token': token.key}, status=HTTP_200_OK)
         else:
-            return JsonResponse({'status': 'fail', 'token': ''}, status=HTTP_400_BAD_REQUEST)
+            return JsonResponse({'status': 'Wrong Password!', 'token': ''}, status=HTTP_400_BAD_REQUEST)
     else:
         return JsonResponse({'status': 'fail', 'response': 'user could not be found!'})
 

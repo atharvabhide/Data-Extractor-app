@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 import time
 
-def upload_file(applicant_token):
+def upload_file(applicant_token, email):
     if applicant_token:
         with st.form("my_form"):
             st.write("Upload your file here")
@@ -17,12 +17,14 @@ def upload_file(applicant_token):
                         "file": (file_name, file_content, file_type)
                     }
                     headers = {"Authorization": f"Token {applicant_token}"}
+                    json = {"email": email}
                     response = requests.post("http://127.0.0.1:8000/api/files/", 
                                              headers=headers,
-                                             files=data)
+                                             files=data,
+                                             data=json)
 
                     if response.status_code == 201:
-                        st.success("File uploaded successfully!")
+                        st.success("File uploaded successfully! Go the the dashboard to see the results.")
                     else:
                         st.error("File upload failed.")
                 else:
@@ -36,8 +38,7 @@ def upload_file(applicant_token):
 
 def login_page(applicant_token):
     if(applicant_token):
-        st.header(":100: PDF/PNG/JPEG/JPG Data Extractor :hourglass_flowing_sand:")
-        upload_file(applicant_token=applicant_token)
+        upload_file(applicant_token=applicant_token, email=st.session_state['email'])
     else:
         with st.form("my_form"):            
             email = st.text_input(label='Email')
@@ -54,6 +55,7 @@ def login_page(applicant_token):
                     if applicant_token:
                        st.session_state.key = 'applicant-token'
                        st.session_state['applicant-token'] = applicant_token
+                       st.session_state['email'] = email
                        st.experimental_rerun()
 
 def register(applicant_token):
@@ -92,8 +94,17 @@ def log_out(applicant_token):
 
 def load_view():
 
+    st.set_page_config(
+     page_title="Data Extractor App",
+     page_icon="🧊",
+     layout="wide",
+     initial_sidebar_state="expanded",
+    )
+
+    st.header(":100: PDF/PNG/JPEG/JPG Data Extractor :hourglass_flowing_sand:")
+
     add_selectbox = st.sidebar.selectbox(
-    "Login/Logout/Register",
+    "Please select an option:",
     ("Login", "Register","Log out")
     )
 
