@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import time
 import csv
+import base64
 
 def extract_data(applicant_token, response):
     headers = {"Authorization": f"Token {applicant_token}"}
@@ -14,11 +15,16 @@ def extract_data(applicant_token, response):
     if response.status_code == 200:
         st.success("Data extracted successfully!")
         data = response.content
-        lines = data.decode().split("\n")
-        for line in lines:
-            st.text(line)
+        # Generate a downloadable link for the content
+        download_link = get_download_link(data, "extracted_content.txt")
+        st.markdown(download_link, unsafe_allow_html=True)
     else:
         st.error("Data extraction failed.")
+
+def get_download_link(file_content, file_name):
+    encoded_content = base64.b64encode(file_content).decode()
+    href = f'<a href="data:text/plain;base64,{encoded_content}" download="{file_name}">Download Content</a>'
+    return href
 
 
 def upload_file(applicant_token):
