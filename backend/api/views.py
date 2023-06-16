@@ -1,16 +1,20 @@
-from api.models import User, File, Data
-from api.serializers import FileSerializer, DataSerializer
+from api.models import User, File
+from api.serializers import FileSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import generics
-from django.http import JsonResponse
+from rest_framework.views import APIView
+from django.http import JsonResponse, HttpResponse
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_404_NOT_FOUND,
     HTTP_200_OK
 )
+from api.utils import extract_data
+from backend import settings
+import os
 
 @api_view(('POST',))
 @permission_classes([AllowAny])
@@ -54,12 +58,18 @@ class FileDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = File.objects.all()
     serializer_class = FileSerializer
 
-class DataList(generics.ListCreateAPIView):
+class ExtractData(APIView):
     authentication_classes = [TokenAuthentication]
-    queryset = Data.objects.all()
-    serializer_class = DataSerializer
-
-class DataDetail(generics.RetrieveUpdateDestroyAPIView):
-    authentication_classes = [TokenAuthentication]
-    queryset = Data.objects.all()
-    serializer_class = DataSerializer
+    def post(self, request):
+        data = request.data
+        file = File.objects.get(uuid=data['uuid'])
+        file_path = extract_data(os.path.join(settings.MEDIA_ROOT, file.file.name))
+        print(file_path)
+        with open(file_path, 'r') as csv_file:
+            csv_data = csv_file.read()
+        print(csv_data)
+        # Create the HTTP response
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="data.csv"'
+        response.write(csv_data)
+        return response

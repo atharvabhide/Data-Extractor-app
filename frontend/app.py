@@ -1,19 +1,22 @@
 import streamlit as st 
 import requests
 import time
+import csv
 
 def extract_data(applicant_token, response):
-    st.write(response.json())
     headers = {"Authorization": f"Token {applicant_token}"}
     data = {"uuid": response.json()["uuid"]}
     response = requests.post(
-        "http://127.0.0.1:8000/api/data/",
+        "http://127.0.0.1:8000/api/extract/",
         headers=headers,
         json=data
     )
-    if response.status_code == 201:
+    if response.status_code == 200:
         st.success("Data extracted successfully!")
-        st.write(response.json()["data"])
+        data = response.content
+        lines = data.decode().split("\n")
+        for line in lines:
+            st.text(line)
     else:
         st.error("Data extraction failed.")
 
