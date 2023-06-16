@@ -40,4 +40,5 @@ cd files
 ```
 <br>
 
-![image](https://github.com/atharvabhide/data-extractor-app/assets/67187699/ec93cfbd-9f2a-45c8-a4a3-d07d7ca6d950)
+![image](https://github.com/atharvabhide/data-extractor-app/assets/67187699/5585aa92-ac06-4d3b-a9d4-aaac6f299d7c)
+
