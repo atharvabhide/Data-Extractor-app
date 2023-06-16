@@ -1,4 +1,4 @@
-# Data Extractor Application
+# Data Extractor Application: Deeplogic AI assessment
 
 This application takes in a PDF/PNG/JPEG/JPG file and extracts its data to create a csv file.
 <br>
