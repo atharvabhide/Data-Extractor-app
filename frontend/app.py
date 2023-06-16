@@ -2,7 +2,23 @@ import streamlit as st
 import requests
 import time
 
-def upload_file(applicant_token, email):
+def extract_data(applicant_token, response):
+    st.write(response.json())
+    headers = {"Authorization": f"Token {applicant_token}"}
+    data = {"uuid": response.json()["uuid"]}
+    response = requests.post(
+        "http://127.0.0.1:8000/api/data/",
+        headers=headers,
+        json=data
+    )
+    if response.status_code == 201:
+        st.success("Data extracted successfully!")
+        st.write(response.json()["data"])
+    else:
+        st.error("Data extraction failed.")
+
+
+def upload_file(applicant_token):
     if applicant_token:
         with st.form("my_form"):
             st.write("Upload your file here")
@@ -17,14 +33,13 @@ def upload_file(applicant_token, email):
                         "file": (file_name, file_content, file_type)
                     }
                     headers = {"Authorization": f"Token {applicant_token}"}
-                    json = {"email": email}
                     response = requests.post("http://127.0.0.1:8000/api/files/", 
                                              headers=headers,
-                                             files=data,
-                                             data=json)
+                                             files=data)
 
                     if response.status_code == 201:
-                        st.success("File uploaded successfully! Go the the dashboard to see the results.")
+                        st.success("File uploaded successfully!")
+                        extract_data(applicant_token=applicant_token, response=response)
                     else:
                         st.error("File upload failed.")
                 else:
@@ -36,9 +51,10 @@ def upload_file(applicant_token, email):
             if submit_res:
                 login_page(applicant_token=applicant_token)
 
+
 def login_page(applicant_token):
     if(applicant_token):
-        upload_file(applicant_token=applicant_token, email=st.session_state['email'])
+        upload_file(applicant_token=applicant_token)
     else:
         with st.form("my_form"):            
             email = st.text_input(label='Email')
@@ -55,8 +71,8 @@ def login_page(applicant_token):
                     if applicant_token:
                        st.session_state.key = 'applicant-token'
                        st.session_state['applicant-token'] = applicant_token
-                       st.session_state['email'] = email
                        st.experimental_rerun()
+
 
 def register(applicant_token):
     if applicant_token:
@@ -80,7 +96,12 @@ def register(applicant_token):
                 response = requests.post('http://127.0.0.1:8000/api/register/',
                 headers=headers, json={"email":email, "username": username,"password":password})
                 if response.status_code == 200:
+                    st.success("You have successfully registered!")
                     st.experimental_rerun()
+                else:
+                    st.error("Registration failed.")
+                    st.experimental_rerun()
+
 
 def log_out(applicant_token):
     if applicant_token:
@@ -91,6 +112,7 @@ def log_out(applicant_token):
                     if 'applicant-token' in st.session_state:
                         del st.session_state['applicant-token']
                     st.write("You are now logged out!")        
+
 
 def load_view():
 
@@ -117,6 +139,7 @@ def load_view():
         register(applicant_token=applicant_token)
     elif add_selectbox == 'Log out':
         log_out(applicant_token=applicant_token)
+
 
 if __name__ == '__main__':
     load_view()

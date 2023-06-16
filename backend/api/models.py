@@ -24,3 +24,14 @@ class File(models.Model):
 
     def __str__(self):
         return self.file.name
+
+class Data(models.Model):
+    uuid = models.UUIDField(blank=False, null=False, default=uuid.uuid4)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='data')
+    file = models.ForeignKey(File, on_delete=models.CASCADE, related_name='data', null=True, blank=True)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt = models.DateTimeField(auto_now=True)
+    data = models.FileField(upload_to='data/', blank=False, null=False)
+
+    def __str__(self):
+        return self.data.name

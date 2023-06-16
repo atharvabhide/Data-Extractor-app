@@ -1,5 +1,5 @@
-from api.models import User, File
-from api.serializers import FileSerializer
+from api.models import User, File, Data
+from api.serializers import FileSerializer, DataSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
@@ -53,3 +53,13 @@ class FileDetail(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [TokenAuthentication]
     queryset = File.objects.all()
     serializer_class = FileSerializer
+
+class DataList(generics.ListCreateAPIView):
+    authentication_classes = [TokenAuthentication]
+    queryset = Data.objects.all()
+    serializer_class = DataSerializer
+
+class DataDetail(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = [TokenAuthentication]
+    queryset = Data.objects.all()
+    serializer_class = DataSerializer
